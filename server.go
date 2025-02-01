@@ -19,7 +19,7 @@ type server struct {
 	pb.UnimplementedNewsScraperServer
 }
 
-// SendEmail sends the scraped news using AWS SES
+// SendEmail sends the scraped news using AWS SES with a structured format
 func SendEmail(recipient string, articles []*pb.NewsArticle) error {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-2"))
 	if err != nil {
@@ -29,35 +29,74 @@ func SendEmail(recipient string, articles []*pb.NewsArticle) error {
 	client := ses.NewFromConfig(cfg)
 
 	subject := "📰 Daily Tech News from The Verge"
-	body := "Here are the top 3 tech news articles from The Verge:\n\n"
 
+	// 📝 Plain Text Version (fallback for non-HTML email clients)
+	plainBody := "Here are the top 3 tech news articles from The Verge:\n\n"
 	for i, article := range articles {
-		body += fmt.Sprintf("%d. %s\n   Author: %s\n   Date: %s\n   URL: %s\n\n",
+		plainBody += fmt.Sprintf("%d. %s\n   Author: %s\n   Date: %s\n   URL: %s\n\n",
 			i+1, article.Title, article.Author, article.Date, article.Url)
 	}
+	plainBody += "Stay updated with the latest tech trends! 🚀\n\nBest regards,\nWeb Scraper Bot"
 
-	body += "Stay updated with the latest tech trends! 🚀\n\nBest regards,\nWeb Scraper Bot"
+	// 🌐 HTML Version (structured email)
+	htmlBody := `<html>
+	<head>
+		<style>
+			body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+			.container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+			h1 { color: #333; }
+			.article { margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #ddd; }
+			.article:last-child { border-bottom: none; }
+			.title { font-size: 18px; font-weight: bold; color: #0073e6; text-decoration: none; }
+			.meta { font-size: 14px; color: #555; margin: 5px 0; }
+			.footer { font-size: 12px; color: #888; margin-top: 20px; text-align: center; }
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>📰 Top 3 Tech News from The Verge</h1>`
 
+	// Add each article in a structured format
+	for i, article := range articles {
+		htmlBody += fmt.Sprintf(`
+			<div class="article">
+				<a href="%s" class="title">%d. %s</a>
+				<div class="meta">Author: %s | Date: %s</div>
+			</div>`, article.Url, i+1, article.Title, article.Author, article.Date)
+	}
+
+	// Footer
+	htmlBody += `
+			<div class="footer">
+				Stay updated with the latest tech trends! 🚀<br>
+				<em>Sent by Web Scraper Bot</em>
+			</div>
+		</div>
+	</body>
+</html>`
+
+	// 📧 SES Email Input
 	input := &ses.SendEmailInput{
-		Destination: &types.Destination{ // ✅ Use types.Destination
+		Destination: &types.Destination{
 			ToAddresses: []string{recipient},
 		},
-		Message: &types.Message{ // ✅ Use types.Message
-			Body: &types.Body{ // ✅ Use types.Body
-				Text: &types.Content{ // ✅ Use types.Content
-					Data: aws.String(body),
+		Message: &types.Message{
+			Body: &types.Body{
+				Text: &types.Content{
+					Data: aws.String(plainBody),
 				},
 				Html: &types.Content{
-					Data: aws.String("<h1>Daily Tech News</h1><p>" + body + "</p>"),
+					Data: aws.String(htmlBody),
 				},
 			},
 			Subject: &types.Content{
 				Data: aws.String(subject),
 			},
 		},
-		Source: aws.String("wh.tenghe@gmail.com"), // ✅ Make sure this email is verified in AWS SES
+		Source: aws.String("wh.tenghe@gmail.com"), // ✅ Ensure this email is verified in AWS SES
 	}
 
+	// Send the email
 	_, err = client.SendEmail(context.TODO(), input)
 	if err != nil {
 		return fmt.Errorf("failed to send email: %v", err)
