@@ -13,7 +13,7 @@ func main() {
 
 	// Start a Selenium WebDriver session
 	caps := selenium.Capabilities{"browserName": "chrome"}
-	driver, err := selenium.NewRemote(caps, fmt.Sprintf("http://localhost:%d", chromeDriverPort)) // ✅ FIXED URL
+	driver, err := selenium.NewRemote(caps, fmt.Sprintf("http://localhost:%d", chromeDriverPort)) 
 	if err != nil {
 		log.Fatalf("Error starting WebDriver: %v", err)
 	}
@@ -47,10 +47,11 @@ func main() {
 	}
 
 	// Extract article URLs
-	urls, err := driver.FindElements(selenium.ByCSSSelector, "a._1lkmsmo1._184mftor")
+	urls, err := driver.FindElements(selenium.ByCSSSelector, "a._1lkmsmo1")
 	if err != nil {
 		log.Fatalf("Error finding URLs: %v", err)
 	}
+
 	fmt.Println("Top 3 News Articles from The Verge:")
 
 	for i := 0; i < 3; i++ {
