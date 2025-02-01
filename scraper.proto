@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package main;
+
+option go_package = "./scraperpb";
+
+service NewsScraper {
+
+    rpc GetTopNews (Empty) returns (NewsResponse);
+}
+
+message Empty {}
+
+message NewsArticle {
+    string title = 1;
+    string author = 2;
+    string date = 3;
+    string url = 4;
+}
+
+message NewsResponse {
+    repeated NewsArticle articles = 1;
+}
