@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
-	"github.com/tebeka/selenium"
 	pb "web-scraper-go/scraperpb"
+
+	"github.com/tebeka/selenium"
 )
 
 func ScrapeTopNews() []*pb.NewsArticle {
@@ -37,7 +39,14 @@ func ScrapeTopNews() []*pb.NewsArticle {
 		title, _ := titles[i].Text()
 		author, _ := authors[i].Text()
 		date, _ := dates[i].Text()
-		link, _ := urls[i].GetAttribute("href")
+		href, _ :=  urls[i].GetAttribute("href")
+
+
+		// Combine base URL with href if needed
+		link := href
+		if !strings.HasPrefix(href, "http") {
+			link = "https://www.theverge.com" + href
+		}
 
 		articles = append(articles, &pb.NewsArticle{
 			Title:  title,
