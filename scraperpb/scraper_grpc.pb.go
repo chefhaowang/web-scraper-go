@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NewsScraperClient interface {
-	GetTopNews(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*NewsResponse, error)
+	GetTopNews(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*NewsResponse, error)
 }
 
 type newsScraperClient struct {
@@ -37,7 +37,7 @@ func NewNewsScraperClient(cc grpc.ClientConnInterface) NewsScraperClient {
 	return &newsScraperClient{cc}
 }
 
-func (c *newsScraperClient) GetTopNews(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*NewsResponse, error) {
+func (c *newsScraperClient) GetTopNews(ctx context.Context, in *EmailRequest, opts ...grpc.CallOption) (*NewsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(NewsResponse)
 	err := c.cc.Invoke(ctx, NewsScraper_GetTopNews_FullMethodName, in, out, cOpts...)
@@ -51,7 +51,7 @@ func (c *newsScraperClient) GetTopNews(ctx context.Context, in *Empty, opts ...g
 // All implementations must embed UnimplementedNewsScraperServer
 // for forward compatibility.
 type NewsScraperServer interface {
-	GetTopNews(context.Context, *Empty) (*NewsResponse, error)
+	GetTopNews(context.Context, *EmailRequest) (*NewsResponse, error)
 	mustEmbedUnimplementedNewsScraperServer()
 }
 
@@ -62,7 +62,7 @@ type NewsScraperServer interface {
 // pointer dereference when methods are called.
 type UnimplementedNewsScraperServer struct{}
 
-func (UnimplementedNewsScraperServer) GetTopNews(context.Context, *Empty) (*NewsResponse, error) {
+func (UnimplementedNewsScraperServer) GetTopNews(context.Context, *EmailRequest) (*NewsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTopNews not implemented")
 }
 func (UnimplementedNewsScraperServer) mustEmbedUnimplementedNewsScraperServer() {}
@@ -87,7 +87,7 @@ func RegisterNewsScraperServer(s grpc.ServiceRegistrar, srv NewsScraperServer) {
 }
 
 func _NewsScraper_GetTopNews_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(EmailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func _NewsScraper_GetTopNews_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: NewsScraper_GetTopNews_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsScraperServer).GetTopNews(ctx, req.(*Empty))
+		return srv.(NewsScraperServer).GetTopNews(ctx, req.(*EmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

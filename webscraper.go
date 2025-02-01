@@ -19,18 +19,12 @@ func ScrapeTopNews() []*pb.NewsArticle {
 	}
 	defer driver.Quit()
 
-
-	log.Println("🌐 Navigating to The Verge Tech page")
-
 	url := "https://www.theverge.com/tech"
 	if err := driver.Get(url); err != nil {
 		log.Fatalf("Failed to load page: %v", err)
 	}
 
-	log.Println("⏳ Waiting for page to load...")
 	time.Sleep(5 * time.Second)
-
-	log.Println("🔍 Extracting articles...")
 
 	titles, _ := driver.FindElements(selenium.ByCSSSelector, "a._1lkmsmo1")
 	authors, _ := driver.FindElements(selenium.ByCSSSelector, "span._1lldluw2 span")
@@ -52,5 +46,6 @@ func ScrapeTopNews() []*pb.NewsArticle {
 			Url:    link,
 		})
 	}
+
 	return articles
 }
