@@ -30,7 +30,6 @@ func SendEmail(recipient string, articles []*pb.NewsArticle) error {
 
 	subject := "📰 Daily Tech News from The Verge"
 
-	// 📝 Plain Text Version (fallback for non-HTML email clients)
 	plainBody := "Here are the top 3 tech news articles from The Verge:\n\n"
 	for i, article := range articles {
 		plainBody += fmt.Sprintf("%d. %s\n   Author: %s\n   Date: %s\n   URL: %s\n\n",
@@ -38,7 +37,6 @@ func SendEmail(recipient string, articles []*pb.NewsArticle) error {
 	}
 	plainBody += "Stay updated with the latest tech trends! 🚀\n\nBest regards,\nWeb Scraper Bot"
 
-	// 🌐 HTML Version (structured email)
 	htmlBody := `<html>
 	<head>
 		<style>
@@ -75,7 +73,7 @@ func SendEmail(recipient string, articles []*pb.NewsArticle) error {
 	</body>
 </html>`
 
-	// 📧 SES Email Input
+	// SES Email Input (ses sdk calling)
 	input := &ses.SendEmailInput{
 		Destination: &types.Destination{
 			ToAddresses: []string{recipient},
@@ -93,7 +91,7 @@ func SendEmail(recipient string, articles []*pb.NewsArticle) error {
 				Data: aws.String(subject),
 			},
 		},
-		Source: aws.String("wh.tenghe@gmail.com"), // ✅ Ensure this email is verified in AWS SES
+		Source: aws.String("wh.tenghe@gmail.com"), // this email is verified in AWS SES
 	}
 
 	// Send the email
