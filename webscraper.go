@@ -3,13 +3,21 @@ package main
 import (
 	"fmt"
 	"log"
+	"os/exec"
 	"strings"
 	"time"
-
 	pb "web-scraper-go/scraperpb"
 
 	"github.com/tebeka/selenium"
 )
+
+func cleanupChrome() {
+    exec.Command("pkill", "-f", "chrome").Run()
+    exec.Command("pkill", "-f", "chromedriver").Run()
+    exec.Command("rm", "-rf", "/tmp/chrome-user-data-*").Run()
+}
+
+
 
 func ScrapeTopNews() []*pb.NewsArticle {
 	chromeDriverPort := 52777
@@ -19,6 +27,9 @@ func ScrapeTopNews() []*pb.NewsArticle {
 	if err != nil {
 		log.Fatalf("Error starting WebDriver: %v", err)
 	}
+
+	// Call cleanup after each scraping session
+	defer cleanupChrome()
 	defer driver.Quit()
 
 	url := "https://www.theverge.com/tech"
@@ -58,3 +69,4 @@ func ScrapeTopNews() []*pb.NewsArticle {
 
 	return articles
 }
+

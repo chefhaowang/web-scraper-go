@@ -19,7 +19,6 @@ func main() {
 
 	client := pb.NewNewsScraperClient(conn)
 
-	// Email of the subscriber
 	email := "1242107568@qq.com" 
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*180)
