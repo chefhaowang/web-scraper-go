@@ -23,7 +23,7 @@ func ScrapeTopNews() []*pb.NewsArticle {
 	chromeDriverPort := 52777
 	caps := selenium.Capabilities{"browserName": "chrome"}
 
-	driver, err := selenium.NewRemote(caps, fmt.Sprintf("http://localhost:%d", chromeDriverPort))
+	driver, err := selenium.NewRemote(caps, fmt.Sprintf("http://3.104.120.8:%d", chromeDriverPort))
 	if err != nil {
 		log.Fatalf("Error starting WebDriver: %v", err)
 	}
